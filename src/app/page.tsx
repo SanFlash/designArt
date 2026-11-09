@@ -65,9 +65,44 @@ const list=useMemo(()=>catalog.filter(g=>(category==="All"||g.category===categor
 const persist=(arr:Design[])=>{setSaved(arr);void putProjects(arr).catch(()=>notify("Could not save to the local database. Export important previews."))};
 const loadPhoto=(f?:File)=>{if(!f)return;if(!f.type.startsWith("image/"))return notify("Choose a valid image.");if(f.size>12*1024*1024)return notify("Image must be smaller than 12 MB.");const r=new FileReader();r.onload=()=>{setPhoto(String(r.result));setFace("");setResult("");notify("Photograph uploaded.")};r.readAsDataURL(f)};
 const extract=()=>{if(!photo)return notify("Upload a photograph first.");const img=new Image();img.onload=()=>{const c=document.createElement("canvas");c.width=600;c.height=600;const x=c.getContext("2d")!;const side=Math.min(img.width*crop.size/100,img.height*crop.size/100);const sx=Math.max(0,Math.min(img.width-side,img.width*crop.x/100)),sy=Math.max(0,Math.min(img.height-side,img.height*crop.y/100));x.save();x.beginPath();x.ellipse(300,300,282,294,0,0,Math.PI*2);x.clip();x.drawImage(img,sx,sy,side,side,0,0,600,600);x.restore();setFace(c.toDataURL("image/png"));notify("Face cutout prepared. Adjust its placement and generate.")};img.src=photo};
-const generate=()=>{if(!face)return notify("Prepare your face cutout first.");const c=canvas.current!;const x=c.getContext("2d")!;c.width=720;c.height=900;const bg=x.createLinearGradient(0,0,720,900);bg.addColorStop(0,"#f1e9df");bg.addColorStop(1,"#d6c8b8");x.fillStyle=bg;x.fillRect(0,0,720,900);x.fillStyle="rgba(255,255,255,.35)";x.beginPath();x.ellipse(360,430,270,380,0,0,Math.PI*2);x.fill();x.fillStyle="#bd8b72";x.beginPath();x.ellipse(360,165,75,94,0,0,Math.PI*2);x.fill();x.fillRect(325,220,70,65);
-x.fillStyle=s.color;x.beginPath();if(item.type==="suit"||item.type==="shirt"){x.moveTo(270,270);x.lineTo(315,250);x.lineTo(405,250);x.lineTo(450,270);x.lineTo(535,450);x.lineTo(475,485);x.lineTo(450,420);x.lineTo(475,790);x.lineTo(245,790);x.lineTo(270,420);x.lineTo(245,485);x.lineTo(185,450)}else if(item.type==="saree"){x.moveTo(280,270);x.lineTo(440,270);x.lineTo(490,790);x.lineTo(235,790);x.lineTo(260,440);x.lineTo(180,780);x.lineTo(125,760);x.lineTo(250,380)}else{x.moveTo(270,270);x.lineTo(315,250);x.lineTo(405,250);x.lineTo(450,270);x.lineTo(520,790);x.lineTo(200,790)}x.closePath();x.fill();x.strokeStyle="rgba(255,255,255,.5)";x.lineWidth=4;x.stroke();if(s.embroidery){x.fillStyle="#e9c77c";for(let i=0;i<9;i++){x.beginPath();x.arc(280+i*35,390,5,0,Math.PI*2);x.fill()}}
-x.fillStyle="#30241f";x.beginPath();x.ellipse(360,158,88,105,0,0,Math.PI*2);x.fill();const f=new Image();f.onload=()=>{const z=170*scale;x.save();x.beginPath();x.ellipse(360+offsetX,165+offsetY,z*.48,z*.57,0,0,Math.PI*2);x.clip();x.drawImage(f,360+offsetX-z/2,165+offsetY-z/2,z,z);x.restore();x.fillStyle="#30241f";x.beginPath();x.arc(360+offsetX,90+offsetY,66,Math.PI,Math.PI*2);x.fill();x.fillStyle="#fff";x.font="16px Arial";x.fillText("DESIGNART · TRY-ON CONCEPT",28,855);setResult(c.toDataURL("image/png"));notify("Your outfit preview is ready.")};f.src=face};
+const generate=()=>{
+ if(!face)return notify("Prepare your face cutout first.");
+ const c=canvas.current!;const x=c.getContext("2d")!;c.width=720;c.height=900;
+ const bg=x.createLinearGradient(0,0,720,900);bg.addColorStop(0,"#f6f1e9");bg.addColorStop(1,"#d8cabb");x.fillStyle=bg;x.fillRect(0,0,720,900);
+ const halo=x.createRadialGradient(360,400,40,360,420,390);halo.addColorStop(0,"rgba(255,255,255,.88)");halo.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=halo;x.fillRect(0,0,720,900);
+ x.fillStyle="rgba(48,37,29,.12)";x.beginPath();x.ellipse(360,842,205,18,0,0,Math.PI*2);x.fill();
+ // Neck and softly shaped shoulders provide a neutral editorial dress-form base.
+ const skin=x.createLinearGradient(300,230,420,320);skin.addColorStop(0,"#a97660");skin.addColorStop(.5,"#d6a78d");skin.addColorStop(1,"#a97863");
+ x.fillStyle=skin;x.beginPath();x.moveTo(326,235);x.quadraticCurveTo(360,257,394,235);x.lineTo(405,316);x.quadraticCurveTo(360,340,315,316);x.closePath();x.fill();
+ const garment=new Path2D();
+ if(item.type==="shirt"||item.type==="suit"){
+  garment.moveTo(282,292);garment.bezierCurveTo(305,270,325,265,337,265);garment.lineTo(360,301);garment.lineTo(383,265);garment.bezierCurveTo(405,265,425,270,438,292);garment.lineTo(530,470);garment.quadraticCurveTo(510,500,472,510);garment.lineTo(447,438);garment.lineTo(458,790);garment.quadraticCurveTo(360,810,262,790);garment.lineTo(273,438);garment.lineTo(248,510);garment.quadraticCurveTo(210,500,190,470);garment.closePath();
+ }else if(item.type==="saree"){
+  garment.moveTo(282,292);garment.bezierCurveTo(315,268,330,270,360,300);garment.bezierCurveTo(390,270,405,268,438,292);garment.lineTo(480,420);garment.bezierCurveTo(520,550,500,700,468,820);garment.lineTo(250,820);garment.lineTo(268,510);garment.lineTo(210,805);garment.lineTo(145,780);garment.lineTo(260,385);garment.closePath();
+ }else if(item.type==="lehenga"){
+  garment.moveTo(300,290);garment.quadraticCurveTo(360,330,420,290);garment.lineTo(438,420);garment.bezierCurveTo(510,500,560,690,590,820);garment.quadraticCurveTo(360,870,130,820);garment.bezierCurveTo(160,690,210,500,282,420);garment.closePath();
+ }else{
+  garment.moveTo(282,292);garment.bezierCurveTo(310,270,330,266,337,265);garment.lineTo(360,300);garment.lineTo(383,265);garment.bezierCurveTo(405,266,425,270,438,292);garment.lineTo(480,420);garment.bezierCurveTo(500,560,535,720,565,820);garment.quadraticCurveTo(360,855,155,820);garment.bezierCurveTo(185,720,220,560,240,420);garment.closePath();
+ }
+ const fabric=x.createLinearGradient(150,280,570,760);fabric.addColorStop(0,"#211b18");fabric.addColorStop(.16,s.color);fabric.addColorStop(.46,s.color);fabric.addColorStop(.72,"rgba(255,255,255,.35)");fabric.addColorStop(1,"#211b18");
+ x.save();x.shadowColor="rgba(48,35,25,.24)";x.shadowBlur=24;x.shadowOffsetY=15;x.fillStyle=fabric;x.fill(garment);x.restore();
+ x.save();x.clip(garment);
+ const sheen=x.createLinearGradient(180,300,540,600);sheen.addColorStop(0,"rgba(255,255,255,.24)");sheen.addColorStop(.45,"rgba(255,255,255,0)");sheen.addColorStop(1,"rgba(0,0,0,.16)");x.fillStyle=sheen;x.fillRect(130,260,470,600);
+ for(let i=0;i<9;i++){const xx=210+i*38;x.beginPath();x.moveTo(xx,330);x.bezierCurveTo(xx-26,470,xx+25,650,xx-5,835);x.strokeStyle=i%2?"rgba(255,255,255,.13)":"rgba(0,0,0,.10)";x.lineWidth=i%2?5:9;x.stroke()}
+ x.strokeStyle="rgba(255,255,255,.42)";x.lineWidth=2;x.beginPath();x.moveTo(230,450);x.quadraticCurveTo(360,490,490,450);x.stroke();
+ if(item.type==="saree"){x.beginPath();x.moveTo(260,310);x.bezierCurveTo(330,430,250,600,190,800);x.strokeStyle="#e4c990";x.lineWidth=9;x.stroke()}
+ if(item.type==="lehenga"){for(let y=690;y<805;y+=38){x.beginPath();x.moveTo(150,y);x.quadraticCurveTo(360,y+55,570,y);x.strokeStyle="rgba(232,207,158,.75)";x.lineWidth=3;x.stroke()}}
+ if(s.embroidery){for(let i=0;i<30;i++){const xx=270+(i%6)*36,yy=420+Math.floor(i/6)*44;x.beginPath();x.moveTo(xx,yy-7);x.lineTo(xx+5,yy);x.lineTo(xx,yy+7);x.lineTo(xx-5,yy);x.closePath();x.strokeStyle="#ead29d";x.lineWidth=2;x.stroke()}}
+ x.restore();
+ // Construction seams and garment-specific neckline detail.
+ x.strokeStyle="rgba(255,255,255,.48)";x.lineWidth=2;x.beginPath();x.moveTo(337,265);x.quadraticCurveTo(360,325,383,265);x.stroke();
+ if(item.type==="suit"){x.beginPath();x.moveTo(360,310);x.lineTo(360,785);x.moveTo(330,420);x.lineTo(348,440);x.lineTo(360,430);x.lineTo(372,440);x.lineTo(390,420);x.stroke()}
+ // Face portrait is kept intact inside a soft oval crop; no identity alteration.
+ const f=new Image();f.onload=()=>{const z=170*scale;x.save();x.beginPath();x.ellipse(360+offsetX,166+offsetY,z*.48,z*.57,0,0,Math.PI*2);x.clip();x.drawImage(f,360+offsetX-z/2,166+offsetY-z/2,z,z);x.restore();
+ x.fillStyle="rgba(48,36,29,.88)";x.beginPath();x.moveTo(278+offsetX,150+offsetY);x.quadraticCurveTo(270+offsetX,42+offsetY,360+offsetX,48+offsetY);x.quadraticCurveTo(450+offsetX,42+offsetY,442+offsetX,150+offsetY);x.quadraticCurveTo(414+offsetX,92+offsetY,360+offsetX,102+offsetY);x.quadraticCurveTo(306+offsetX,92+offsetY,278+offsetX,150+offsetY);x.fill();
+ x.fillStyle="#4d4034";x.font="500 16px Arial";x.fillText("DESIGNART  /  EDITORIAL TRY-ON CONCEPT",28,866);x.fillStyle="#8b7b6b";x.font="12px Arial";x.fillText(item.name+"  ·  "+s.fabric+"  ·  "+s.fit,28,888);
+ setResult(c.toDataURL("image/png"));notify("Editorial garment concept generated. This is not a photorealistic body-fit result.")};f.onerror=()=>notify("Could not load the prepared portrait. Please prepare it again.");f.src=face
+};
 const save=()=>{const d:Design={id:Math.random().toString(36).slice(2),name:title.trim()||"Untitled look",garment:item,settings:{...s},image:result||undefined,updated:new Date().toLocaleString()};persist([d,...saved]);notify("Design saved in this browser.")};
 const download=()=>{if(!result)return notify("Generate a preview first.");const a=document.createElement("a");a.href=result;a.download="designart-look.png";a.click()};
 const open=(d:Design)=>{setItem(d.garment);setS(d.settings);setResult(d.image||"");setTab("Studio")};
