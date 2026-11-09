@@ -1,6 +1,7 @@
 "use client";
 import {useEffect,useMemo,useRef,useState} from "react";
 import {Sparkles,Search,Upload,Camera,Download,Save,Check,Shirt,Heart,Trash2,ArrowUpRight,ChevronRight,RotateCcw,Layers,FolderHeart,Menu} from "lucide-react";
+import {getProjects,putProjects} from "@/lib/db";
 type Garment={id:string;name:string;category:string;type:string;color:string;fabric:string;tag:string};
 type Settings={color:string;fabric:string;neck:string;sleeves:string;length:string;fit:string;pattern:string;embroidery:boolean};
 type Design={id:string;name:string;garment:Garment;settings:Settings;image?:string;updated:string};
@@ -20,11 +21,11 @@ function Art({type,color,embroidery}:{type:string;color:string;embroidery:boolea
 export default function Home(){
 const [tab,setTab]=useState("Studio"),[category,setCategory]=useState("All"),[item,setItem]=useState(catalog[0]),[s,setS]=useState(initial),[photo,setPhoto]=useState(""),[face,setFace]=useState(""),[result,setResult]=useState(""),[crop,setCrop]=useState({x:20,y:5,size:55}),[scale,setScale]=useState(1),[offsetX,setOffsetX]=useState(0),[offsetY,setOffsetY]=useState(0),[saved,setSaved]=useState<Design[]>([]),[title,setTitle]=useState("My new look"),[search,setSearch]=useState(""),[message,setMessage]=useState(""),[menu,setMenu]=useState(false);
 const upload=useRef<HTMLInputElement>(null),canvas=useRef<HTMLCanvasElement>(null);
-useEffect(()=>{try{setSaved(JSON.parse(localStorage.getItem("designart-v1")||"[]"))}catch{}},[]);
+useEffect(()=>{getProjects().then(setSaved).catch(()=>setMessage("Could not open local project database."))},[]);
 const notify=(m:string)=>{setMessage(m);window.setTimeout(()=>setMessage(""),2600)};
 const update=(k:keyof Settings,v:any)=>setS(old=>({...old,[k]:v}));
 const list=useMemo(()=>catalog.filter(g=>(category==="All"||g.category===category)&&(g.name+" "+g.fabric).toLowerCase().includes(search.toLowerCase())),[category,search]);
-const persist=(arr:Design[])=>{setSaved(arr);try{localStorage.setItem("designart-v1",JSON.stringify(arr))}catch{notify("Browser storage is full. Download your preview and remove old projects.")}};
+const persist=(arr:Design[])=>{setSaved(arr);void putProjects(arr).catch(()=>notify("Could not save to the local database. Export important previews."))};
 const loadPhoto=(f?:File)=>{if(!f)return;if(!f.type.startsWith("image/"))return notify("Choose a valid image.");if(f.size>12*1024*1024)return notify("Image must be smaller than 12 MB.");const r=new FileReader();r.onload=()=>{setPhoto(String(r.result));setFace("");setResult("");notify("Photograph uploaded.")};r.readAsDataURL(f)};
 const extract=()=>{if(!photo)return notify("Upload a photograph first.");const img=new Image();img.onload=()=>{const c=document.createElement("canvas");c.width=600;c.height=600;const x=c.getContext("2d")!;const side=Math.min(img.width*crop.size/100,img.height*crop.size/100);const sx=Math.max(0,Math.min(img.width-side,img.width*crop.x/100)),sy=Math.max(0,Math.min(img.height-side,img.height*crop.y/100));x.save();x.beginPath();x.ellipse(300,300,282,294,0,0,Math.PI*2);x.clip();x.drawImage(img,sx,sy,side,side,0,0,600,600);x.restore();setFace(c.toDataURL("image/png"));notify("Face cutout prepared. Adjust its placement and generate.")};img.src=photo};
 const generate=()=>{if(!face)return notify("Prepare your face cutout first.");const c=canvas.current!;const x=c.getContext("2d")!;c.width=720;c.height=900;const bg=x.createLinearGradient(0,0,720,900);bg.addColorStop(0,"#f1e9df");bg.addColorStop(1,"#d6c8b8");x.fillStyle=bg;x.fillRect(0,0,720,900);x.fillStyle="rgba(255,255,255,.35)";x.beginPath();x.ellipse(360,430,270,380,0,0,Math.PI*2);x.fill();x.fillStyle="#bd8b72";x.beginPath();x.ellipse(360,165,75,94,0,0,Math.PI*2);x.fill();x.fillRect(325,220,70,65);
