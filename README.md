@@ -1,16 +1,15 @@
 # DESIGNART — Personal Fashion Studio
 
-A responsive fashion customization studio built with Next.js. The current release includes garment-specific editorial illustrations, fabric shading and drape details, customization controls, and a browser-local design library.
+A responsive fashion studio with photographic garment references, design controls, portrait uploads and a browser-local project library.
 
-## Features
-- Garment catalog for gowns, dresses, sarees, lehengas, suits, shirts and contemporary looks.
-- Garment-specific silhouette paths with fabric highlights, folds, seam details, draping and optional embroidery.
-- Color, fabric, neckline, sleeve, length, fit, pattern and embroidery controls.
-- Portrait upload and manual face crop / placement controls.
-- Editorial concept renderer with garment drape, shading and seam details.
-- Save, reopen, delete and download designs.
-- IndexedDB browser-local persistence.
-- Responsive desktop and mobile interface.
+## Current features
+- Photographic outfit references for evening gowns, column dresses, sarees, lehengas, tailored suits, linen outfits and contemporary dresses.
+- Search and category filters.
+- Design brief controls for color, fabric, neckline, sleeves, length, fit, pattern and embroidery.
+- Portrait upload and adjustable manual crop.
+- Side-by-side personal style board using the user's portrait and the selected outfit photograph.
+- Save, reopen and delete projects using IndexedDB.
+- Responsive desktop and mobile layout.
 
 ## Run locally
 ```bash
@@ -19,15 +18,18 @@ npm run dev
 ```
 Open http://localhost:3000.
 
-## Important try-on limitation
-The fitting-room output is an editorial concept composite, not a photorealistic virtual try-on. The current app does not perform human parsing, pose estimation, body segmentation, cloth warping, occlusion handling, or physics-based fabric simulation. The face crop is manually adjusted and does not perform AI face segmentation. Do not use the preview to judge garment fit or sizing.
+## Important: current realism boundary
+This release removes the cartoon garment drawings and uses photographic fashion references instead. The color/fabric/neckline controls currently save a design brief; they do not physically recolor or reconstruct the clothing in the reference photograph. The generated board places the user's portrait beside the selected outfit reference. It does **not** put the outfit onto the user's body.
 
-A true photorealistic try-on requires an integrated virtual try-on inference service (or a self-hosted model) with consent-based image processing, person/garment segmentation, pose estimation, garment warping and realistic compositing. No AI provider credentials are included in this repository; configure them server-side before enabling such a service. Never expose provider keys in browser code.
+A real virtual try-on requires a model/service that performs person segmentation, pose estimation, garment parsing, clothing warping, occlusion handling and photorealistic synthesis. No such inference model or credentials are configured in this repository. Do not present the current style board as an accurate fitting or sizing result.
 
-## Storage and privacy
-Designs and image previews are stored in IndexedDB in the current browser. They are device- and browser-specific; clearing site data removes them. The app does not upload photographs to a remote AI provider in this release.
+## Image sources and rights
+The catalog uses externally hosted example fashion photographs from the following publishers/retailers for demonstration: ELLE/ Hearst, PeterPhoto, Etsy sellers, Studio East6, Legere, and Olivia Sophie. These images remain the property of their respective rights holders and may be subject to copyright, hotlink restrictions or commercial licensing. Replace them with owned, licensed, or user-uploaded product photography before commercial launch. Image delivery also depends on the source hosts remaining available.
+
+## Privacy and storage
+Portraits and saved projects are stored in IndexedDB in the visitor's browser. The app does not upload user photos to an AI provider in this release. Browser data is device-specific and can be removed by clearing site data.
 
 ## Deployment
-Deploy the repository root as a Next.js project on Vercel. Browser-local storage remains on each visitor's device.
+Deploy the repository root as a Next.js project on Vercel.
 
 Repository: https://github.com/SanFlash/designArt
