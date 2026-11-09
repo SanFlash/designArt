@@ -1,0 +1,5 @@
+export type StoredProject = { id:string; [key:string]: unknown };
+const DB_NAME="designart-local"; const STORE="projects";
+function openDb():Promise<IDBDatabase>{return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,1);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(STORE))db.createObjectStore(STORE,{keyPath:"id"})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
+export async function getProjects<T>():Promise<T[]>{const db=await openDb();return new Promise((resolve,reject)=>{const req=db.transaction(STORE,"readonly").objectStore(STORE).getAll();req.onsuccess=()=>resolve(req.result as T[]);req.onerror=()=>reject(req.error);req.addEventListener("loadend",()=>db.close())})}
+export async function putProjects<T extends {id:string}>(projects:T[]):Promise<void>{const db=await openDb();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,"readwrite");const store=tx.objectStore(STORE);store.clear();for(const p of projects)store.put(p);tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();reject(tx.error)};tx.onabort=()=>{db.close();reject(tx.error)}})}
