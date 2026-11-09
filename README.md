@@ -1,15 +1,16 @@
-# DESIGNART V1
+# DESIGNART — Personal Fashion Studio
 
-A local-first fashion customization and face-composite try-on demonstration built with Next.js.
+A responsive fashion customization studio built with Next.js. The current release includes garment-specific editorial illustrations, fabric shading and drape details, customization controls, and a browser-local design library.
 
 ## Features
-- Curated garment catalog: dresses, ethnicwear, menswear and contemporary styles.
-- Live color, fabric, neckline, sleeve, length, fit, pattern and embroidery controls.
-- Personal photo upload with adjustable face crop.
-- Transparent face cutout and canvas-based compositing onto a stylized fashion template.
-- Save designs and previews in browser-local storage; reopen and delete saved designs.
-- Download PNG try-on concept.
-- Responsive desktop and mobile UI.
+- Garment catalog for gowns, dresses, sarees, lehengas, suits, shirts and contemporary looks.
+- Garment-specific silhouette paths with fabric highlights, folds, seam details, draping and optional embroidery.
+- Color, fabric, neckline, sleeve, length, fit, pattern and embroidery controls.
+- Portrait upload and manual face crop / placement controls.
+- Editorial concept renderer with garment drape, shading and seam details.
+- Save, reopen, delete and download designs.
+- IndexedDB browser-local persistence.
+- Responsive desktop and mobile interface.
 
 ## Run locally
 ```bash
@@ -18,13 +19,15 @@ npm run dev
 ```
 Open http://localhost:3000.
 
-## Storage and privacy
-V1 stores project records and image data in this browser's localStorage. Nothing is uploaded to an AI provider. Data is browser- and device-specific; clearing site data removes saved projects. Download important previews.
+## Important try-on limitation
+The fitting-room output is an editorial concept composite, not a photorealistic virtual try-on. The current app does not perform human parsing, pose estimation, body segmentation, cloth warping, occlusion handling, or physics-based fabric simulation. The face crop is manually adjusted and does not perform AI face segmentation. Do not use the preview to judge garment fit or sizing.
 
-## Try-on limitation
-This is a face-compositing demonstration using a stylized model/template, not automatic face recognition, real body-based fitting, physical cloth simulation, or a fit guarantee. Face cropping is manually adjustable.
+A true photorealistic try-on requires an integrated virtual try-on inference service (or a self-hosted model) with consent-based image processing, person/garment segmentation, pose estimation, garment warping and realistic compositing. No AI provider credentials are included in this repository; configure them server-side before enabling such a service. Never expose provider keys in browser code.
+
+## Storage and privacy
+Designs and image previews are stored in IndexedDB in the current browser. They are device- and browser-specific; clearing site data removes them. The app does not upload photographs to a remote AI provider in this release.
 
 ## Deployment
-The frontend can be deployed to Vercel. Browser-local persistence remains on each visitor's device. For cross-device accounts and centralized image storage, add a hosted database and object storage in a later release.
+Deploy the repository root as a Next.js project on Vercel. Browser-local storage remains on each visitor's device.
 
 Repository: https://github.com/SanFlash/designArt
