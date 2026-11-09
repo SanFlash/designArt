@@ -21,7 +21,7 @@ function Art({type,color,embroidery}:{type:string;color:string;embroidery:boolea
 export default function Home(){
 const [tab,setTab]=useState("Studio"),[category,setCategory]=useState("All"),[item,setItem]=useState(catalog[0]),[s,setS]=useState(initial),[photo,setPhoto]=useState(""),[face,setFace]=useState(""),[result,setResult]=useState(""),[crop,setCrop]=useState({x:20,y:5,size:55}),[scale,setScale]=useState(1),[offsetX,setOffsetX]=useState(0),[offsetY,setOffsetY]=useState(0),[saved,setSaved]=useState<Design[]>([]),[title,setTitle]=useState("My new look"),[search,setSearch]=useState(""),[message,setMessage]=useState(""),[menu,setMenu]=useState(false);
 const upload=useRef<HTMLInputElement>(null),canvas=useRef<HTMLCanvasElement>(null);
-useEffect(()=>{getProjects().then(setSaved).catch(()=>setMessage("Could not open local project database."))},[]);
+useEffect(()=>{getProjects<Design>().then(setSaved).catch(()=>setMessage("Could not open local project database."))},[]);
 const notify=(m:string)=>{setMessage(m);window.setTimeout(()=>setMessage(""),2600)};
 const update=(k:keyof Settings,v:any)=>setS(old=>({...old,[k]:v}));
 const list=useMemo(()=>catalog.filter(g=>(category==="All"||g.category===category)&&(g.name+" "+g.fabric).toLowerCase().includes(search.toLowerCase())),[category,search]);
